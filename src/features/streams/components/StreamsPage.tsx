@@ -15,13 +15,14 @@ export function StreamsPage() {
     loading,
     error,
     remainingCount,
+    hasMore,
     loadMore,
     recordDecision,
     refresh,
   } = useTenders();
 
   const { lastElementRef } = useInfiniteScroll({
-    hasMore: tenders.length > 0,
+    hasMore,
     loading,
     onLoadMore: loadMore,
   });
@@ -83,7 +84,7 @@ export function StreamsPage() {
         <TenderList
           tenders={tenders}
           loading={loading}
-          hasMore={tenders.length > 0}
+          hasMore={hasMore}
           onReject={handleReject}
           onAnalyze={handleAnalyze}
           onViewDetails={handleViewDetails}

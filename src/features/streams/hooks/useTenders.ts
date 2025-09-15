@@ -9,6 +9,7 @@ interface UseTendersReturn {
   error: string | null;
   remainingCount: number;
   totalCount: number;
+  hasMore: boolean;
   loadMore: () => Promise<void>;
   recordDecision: (tenderId: number, decisionStatus: DecisionStatus) => Promise<void>;
   refresh: () => Promise<void>;
@@ -182,6 +183,7 @@ export function useTenders(): UseTendersReturn {
     error,
     remainingCount,
     totalCount,
+    hasMore,
     loadMore,
     recordDecision,
     refresh,
