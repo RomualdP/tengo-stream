@@ -1,5 +1,6 @@
 import { Container, Title, Group, Stack, Alert, Button } from '@mantine/core';
 import { IconAlertCircle, IconRefresh } from '@tabler/icons-react';
+import { useCallback } from 'react';
 import { TenderList } from './TenderList';
 import { StreamCounter } from './StreamCounter';
 import { useTenders } from '../hooks/useTenders';
@@ -11,7 +12,6 @@ export function StreamsPage() {
     loading,
     error,
     remainingCount,
-    totalCount,
     loadMore,
     recordDecision,
     refresh,
@@ -23,13 +23,13 @@ export function StreamsPage() {
     onLoadMore: loadMore,
   });
 
-  const handleReject = async (tenderId: number) => {
+  const handleReject = useCallback(async (tenderId: number) => {
     await recordDecision(tenderId, 'REJECTED');
-  };
+  }, [recordDecision]);
 
-  const handleAnalyze = async (tenderId: number) => {
+  const handleAnalyze = useCallback(async (tenderId: number) => {
     await recordDecision(tenderId, 'TO_ANALYZE');
-  };
+  }, [recordDecision]);
 
   return (
     <Container size="lg" py="md">
@@ -38,7 +38,7 @@ export function StreamsPage() {
         <Group justify="space-between">
           <Title order={2}>Formation Paris</Title>
           <Group gap="sm">
-            <StreamCounter remainingCount={remainingCount} totalCount={totalCount} />
+            <StreamCounter remainingCount={remainingCount} />
             <Button
               variant="outline"
               size="xs"

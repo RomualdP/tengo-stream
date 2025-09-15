@@ -14,10 +14,20 @@ export function useInfiniteScroll({
   threshold = 100,
 }: UseInfiniteScrollOptions) {
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const onLoadMoreRef = useRef(onLoadMore);
+  const hasMoreRef = useRef(hasMore);
+  const loadingRef = useRef(loading);
+
+  // Update refs to avoid stale closures
+  useEffect(() => {
+    onLoadMoreRef.current = onLoadMore;
+    hasMoreRef.current = hasMore;
+    loadingRef.current = loading;
+  });
 
   const lastElementRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (loading) return;
+      if (loadingRef.current) return;
       
       if (observerRef.current) {
         observerRef.current.disconnect();
@@ -25,8 +35,8 @@ export function useInfiniteScroll({
       
       observerRef.current = new IntersectionObserver(
         (entries) => {
-          if (entries[0].isIntersecting && hasMore) {
-            onLoadMore();
+          if (entries[0].isIntersecting && hasMoreRef.current && !loadingRef.current) {
+            onLoadMoreRef.current();
           }
         },
         {
@@ -38,7 +48,7 @@ export function useInfiniteScroll({
         observerRef.current.observe(node);
       }
     },
-    [loading, hasMore, onLoadMore, threshold]
+    [threshold] // Only threshold as dependency
   );
 
   useEffect(() => {

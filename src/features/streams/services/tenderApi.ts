@@ -42,6 +42,11 @@ export class TenderApiService {
       });
 
       if (!response.ok) {
+        if (response.status === 409) {
+          // Tender already processed - this is not really an error for the user
+          console.log(`Tender ${tenderId} already processed`);
+          return;
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {

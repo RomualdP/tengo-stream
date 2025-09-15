@@ -1,5 +1,6 @@
 import { Card, Text, Group, Button, Stack, Box } from '@mantine/core';
 import { IconBuilding, IconCalendar, IconCurrencyEuro, IconClock, IconMapPin, IconPackage } from '@tabler/icons-react';
+import { useState } from 'react';
 import type { Tender } from '../types';
 
 interface TenderCardProps {
@@ -9,6 +10,27 @@ interface TenderCardProps {
 }
 
 export function TenderCard({ tender, onReject, onAnalyze }: TenderCardProps) {
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleReject = async () => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+    try {
+      await onReject?.(tender.id);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleAnalyze = async () => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+    try {
+      await onAnalyze?.(tender.id);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
       day: 'numeric',
@@ -109,7 +131,9 @@ export function TenderCard({ tender, onReject, onAnalyze }: TenderCardProps) {
             variant="outline"
             color="red"
             size="xs"
-            onClick={() => onReject?.(tender.id)}
+            onClick={handleReject}
+            disabled={isProcessing}
+            loading={isProcessing}
           >
             X Rejeter
           </Button>
@@ -117,7 +141,9 @@ export function TenderCard({ tender, onReject, onAnalyze }: TenderCardProps) {
             variant="filled"
             color="blue"
             size="xs"
-            onClick={() => onAnalyze?.(tender.id)}
+            onClick={handleAnalyze}
+            disabled={isProcessing}
+            loading={isProcessing}
           >
             ✓ À analyser
           </Button>
