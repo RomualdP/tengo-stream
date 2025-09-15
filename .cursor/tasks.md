@@ -49,12 +49,17 @@ Implémenter la fonctionnalité Streams avec :
   - Layout responsive avec Mantine
   - Données mockées
 
-### Phase 3 : Intégration API
-- [ ] **3.1** Service API
-  - Fonction pour récupérer les marchés (POST /tenders/search)
-  - Fonction pour enregistrer les décisions (POST /interactions/decisionStatus)
+### Phase 3 : Refactorisation API
+- [ ] **3.1** Refactorisation des routes backend
+  - Migration vers architecture RESTful
+  - Routes GET/POST/PUT/DELETE cohérentes
+  - Support des query parameters pour filtres
+  - Pagination standardisée
+- [ ] **3.2** Service API frontend
+  - Fonctions pour toutes les routes REST
   - Gestion des erreurs et types de retour
-- [ ] **3.2** Remplacer les données mockées
+  - Types TypeScript pour les réponses API
+- [ ] **3.3** Remplacer les données mockées
   - Chargement des vrais données depuis l'API
   - Gestion des états de chargement
   - Affichage des erreurs
