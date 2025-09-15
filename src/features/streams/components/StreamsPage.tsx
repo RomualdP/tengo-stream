@@ -1,12 +1,15 @@
 import { Container, Title, Group, Stack, Alert, Button } from '@mantine/core';
 import { IconAlertCircle, IconRefresh } from '@tabler/icons-react';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { TenderList } from './TenderList';
 import { StreamCounter } from './StreamCounter';
+import { TenderDetailPage } from './TenderDetailPage';
 import { useTenders } from '../hooks/useTenders';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 
 export function StreamsPage() {
+  const [selectedTenderId, setSelectedTenderId] = useState<number | null>(null);
+
   const {
     tenders,
     loading,
@@ -30,6 +33,19 @@ export function StreamsPage() {
   const handleAnalyze = useCallback(async (tenderId: number) => {
     await recordDecision(tenderId, 'TO_ANALYZE');
   }, [recordDecision]);
+
+  const handleViewDetails = useCallback((tenderId: number) => {
+    setSelectedTenderId(tenderId);
+  }, []);
+
+  const handleBackToList = useCallback(() => {
+    setSelectedTenderId(null);
+  }, []);
+
+  // Show detail page if a tender is selected
+  if (selectedTenderId) {
+    return <TenderDetailPage tenderId={selectedTenderId} onBack={handleBackToList} />;
+  }
 
   return (
     <Container size="lg" py="md">
@@ -70,6 +86,7 @@ export function StreamsPage() {
           hasMore={tenders.length > 0}
           onReject={handleReject}
           onAnalyze={handleAnalyze}
+          onViewDetails={handleViewDetails}
           onLoadMore={loadMore}
         />
 

@@ -8,6 +8,7 @@ interface TenderListProps {
   hasMore?: boolean;
   onReject?: (tenderId: number) => void;
   onAnalyze?: (tenderId: number) => void;
+  onViewDetails?: (tenderId: number) => void;
   onLoadMore?: () => void;
 }
 
@@ -16,7 +17,8 @@ export function TenderList({
   loading = false, 
   hasMore = false, 
   onReject, 
-  onAnalyze
+  onAnalyze,
+  onViewDetails
 }: TenderListProps) {
   return (
     <Stack gap="md">
@@ -26,6 +28,7 @@ export function TenderList({
           tender={tender}
           onReject={onReject}
           onAnalyze={onAnalyze}
+          onViewDetails={onViewDetails}
         />
       ))}
       
