@@ -54,6 +54,8 @@ export interface TenderSearchResponse {
     take: number;
   };
   results: Tender[];
+  totalCount: number;
+  remainingCount: number;
 }
 
 export interface Stream {

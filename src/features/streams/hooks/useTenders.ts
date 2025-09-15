@@ -35,11 +35,11 @@ export function useTenders(): UseTendersReturn {
       
       if (reset) {
         setTenders(response.results);
-        setTotalCount(response.results.length);
-        setRemainingCount(response.results.length);
+        setTotalCount(response.totalCount);
+        setRemainingCount(response.remainingCount);
       } else {
         setTenders(prev => [...prev, ...response.results]);
-        setRemainingCount(prev => prev + response.results.length);
+        setRemainingCount(response.remainingCount);
       }
       
       setSkip(currentSkip + response.results.length);
@@ -65,6 +65,7 @@ export function useTenders(): UseTendersReturn {
       // Remove the tender from the list
       setTenders(prev => prev.filter(tender => tender.id !== tenderId));
       setRemainingCount(prev => Math.max(0, prev - 1));
+      setTotalCount(prev => Math.max(0, prev - 1));
       
       // If we're running low on tenders, load more
       if (tenders.length <= 5 && hasMore) {

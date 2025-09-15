@@ -14,7 +14,13 @@ app.post('/tenders/search', (req, res) => {
   const interactedTenderIds = new Set(interactions.map(i => i.tenderId));
   const filteredTenders = tenders.filter(t => !interactedTenderIds.has(t.id));
   const results = filteredTenders.slice(skip, skip + take);
-  res.json({ pagination: { skip, take }, results });
+  
+  res.json({ 
+    pagination: { skip, take }, 
+    results,
+    totalCount: filteredTenders.length,
+    remainingCount: filteredTenders.length - skip
+  });
 });
 
 app.post('/interactions/decisionStatus', (req, res) => {

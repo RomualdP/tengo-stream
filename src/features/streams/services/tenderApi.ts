@@ -50,17 +50,4 @@ export class TenderApiService {
     }
   }
 
-  /**
-   * Get total number of available tenders
-   */
-  static async getTotalTendersCount(): Promise<number> {
-    try {
-      // To get the total, we make a request with a very large take
-      const response = await this.searchTenders(0, 10000);
-      return response.results.length;
-    } catch (error) {
-      console.error('Error getting total tenders count:', error);
-      return 0;
-    }
-  }
 }
