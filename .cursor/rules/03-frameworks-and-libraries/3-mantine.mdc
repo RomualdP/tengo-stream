@@ -1,0 +1,43 @@
+---
+description: Apply Mantine UI library standards for React components, ensuring consistent design system usage and proper component composition when developing with Mantine in React applications.
+alwaysApply: false
+---
+
+Component Usage:
+- Use Mantine components as the primary UI building blocks.
+- Prefer Mantine components over custom HTML elements.
+- Import components from `@mantine/core` for basic components.
+- Import from specific packages for advanced features (`@mantine/hooks`, `@mantine/form`, etc.).
+
+Component Structure:
+- Wrap applications with `MantineProvider` at the root level.
+- Use `Container` component for responsive layouts.
+- Apply `Paper` component for card-like surfaces.
+- Use `Group` and `Stack` for flexible layouts instead of custom flexbox.
+
+Form Handling:
+- Use `@mantine/form` for form state management.
+- Apply `TextInput`, `Select`, `Checkbox`, `Switch` components for form fields.
+- Use `Button` component with proper variants (`filled`, `outline`, `subtle`).
+- Implement form validation with Mantine's built-in validation.
+
+Typography and Spacing:
+- Use Mantine's typography components (`Title`, `Text`, `Anchor`).
+- Apply consistent spacing with Mantine's spacing scale.
+- Use `rem` units for responsive typography.
+
+Theme Customization:
+- Configure theme through `MantineProvider` props.
+- Use CSS variables for custom theme values.
+- Maintain design system consistency across components.
+
+Accessibility:
+- Leverage Mantine's built-in accessibility features.
+- Use semantic components (`Button`, `Anchor`, `Heading`).
+- Ensure proper focus management and keyboard navigation.
+
+Best Practices:
+- Keep component props typed with TypeScript.
+- Use Mantine's responsive props for mobile-first design.
+- Prefer composition over customization when possible.
+- Use Mantine's color palette for consistent branding.
