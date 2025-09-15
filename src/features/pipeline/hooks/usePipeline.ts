@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { TenderApiService } from '../../streams/services/tenderApi';
 import type { Tender } from '../../streams/types';
 
@@ -34,7 +35,35 @@ export function usePipeline(): UsePipelineReturn {
   }, []);
 
   const refresh = useCallback(async () => {
-    await loadPipelineTenders();
+    try {
+      await loadPipelineTenders();
+      toast.success('Pipeline actualisé', {
+        icon: '✓',
+        style: {
+          background: '#ffffff',
+          color: '#333333',
+          border: '1px solid #e5e7eb',
+        },
+        iconTheme: {
+          primary: '#10b981',
+          secondary: '#ffffff',
+        },
+      });
+    } catch (err) {
+      console.error('Pipeline refresh error:', err);
+      toast.error('Erreur lors de l\'actualisation du pipeline', {
+        icon: '✕',
+        style: {
+          background: '#ffffff',
+          color: '#333333',
+          border: '1px solid #e5e7eb',
+        },
+        iconTheme: {
+          primary: '#ef4444',
+          secondary: '#ffffff',
+        },
+      });
+    }
   }, [loadPipelineTenders]);
 
   useEffect(() => {

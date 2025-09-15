@@ -1,5 +1,5 @@
-import { Container, Title, Stack, Alert, Text, Group, Badge } from '@mantine/core';
-import { IconAlertCircle, IconClipboardList } from '@tabler/icons-react';
+import { Container, Title, Stack, Alert, Text, Group, Badge, Button } from '@mantine/core';
+import { IconAlertCircle, IconClipboardList, IconRefresh } from '@tabler/icons-react';
 import { TenderList } from '../../streams/components/TenderList';
 import { usePipeline } from '../hooks/usePipeline';
 
@@ -9,6 +9,7 @@ export function PipelinePage() {
     loading,
     error,
     totalCount,
+    refresh,
   } = usePipeline();
 
   return (
@@ -21,6 +22,15 @@ export function PipelinePage() {
             <Badge size="lg" variant="light" color="green">
               {totalCount} À analyser
             </Badge>
+            <Button
+              variant="outline"
+              size="xs"
+              leftSection={<IconRefresh size={14} />}
+              onClick={refresh}
+              loading={loading}
+            >
+              Actualiser
+            </Button>
           </Group>
         </Group>
 

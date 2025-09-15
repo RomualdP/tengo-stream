@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import toast from 'react-hot-toast';
 import { TenderApiService } from '../services/tenderApi';
 import type { Tender, DecisionStatus } from '../types';
 
@@ -91,13 +92,83 @@ export function useTenders(): UseTendersReturn {
       setRemainingCount(prev => Math.max(0, prev - 1));
       setTotalCount(prev => Math.max(0, prev - 1));
       
+      // Show success notification with custom icons
+      if (decisionStatus === 'TO_ANALYZE') {
+        toast.success('Marché ajouté au pipeline', {
+          icon: '✓',
+          style: {
+            background: '#ffffff',
+            color: '#333333',
+            border: '1px solid #e5e7eb',
+          },
+          iconTheme: {
+            primary: '#10b981',
+            secondary: '#ffffff',
+          },
+        });
+      } else {
+        toast.success('Marché rejeté', {
+          icon: '✕',
+          style: {
+            background: '#ffffff',
+            color: '#333333',
+            border: '1px solid #e5e7eb',
+          },
+          iconTheme: {
+            primary: '#ef4444',
+            secondary: '#ffffff',
+          },
+        });
+      }
+      
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to record decision');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to record decision';
+      setError(errorMessage);
+      toast.error('La décision n\'a pas pu être enregistrée', {
+        icon: '✕',
+        style: {
+          background: '#ffffff',
+          color: '#333333',
+          border: '1px solid #e5e7eb',
+        },
+        iconTheme: {
+          primary: '#ef4444',
+          secondary: '#ffffff',
+        },
+      });
     }
   }, [hasMore, loadTenders]);
 
   const refresh = useCallback(async () => {
-    await loadTenders(true);
+    try {
+      await loadTenders(true);
+      toast.success('Flux actualisé', {
+        icon: '✓',
+        style: {
+          background: '#ffffff',
+          color: '#333333',
+          border: '1px solid #e5e7eb',
+        },
+        iconTheme: {
+          primary: '#10b981',
+          secondary: '#ffffff',
+        },
+      });
+    } catch (err) {
+      console.error('Refresh error:', err);
+      toast.error('Erreur lors de l\'actualisation', {
+        icon: '✕',
+        style: {
+          background: '#ffffff',
+          color: '#333333',
+          border: '1px solid #e5e7eb',
+        },
+        iconTheme: {
+          primary: '#ef4444',
+          secondary: '#ffffff',
+        },
+      });
+    }
   }, [loadTenders]);
 
   // Initial load only
