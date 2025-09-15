@@ -62,7 +62,7 @@ export interface Stream {
   id: string;
   name: string;
   description?: string;
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
   tenderCount: number;
 }
 
