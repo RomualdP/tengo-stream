@@ -1,5 +1,5 @@
 import { Card, Text, Group, Button, Stack, Box } from '@mantine/core';
-import { IconBuilding, IconCalendar, IconCurrencyEuro, IconClock, IconMapPin, IconPackage } from '@tabler/icons-react';
+import { IconBuilding, IconCalendar, IconCurrencyEuro, IconClock, IconMapPin, IconPackage, IconArrowRight } from '@tabler/icons-react';
 import { useState } from 'react';
 import type { Tender } from '../types';
 
@@ -7,9 +7,10 @@ interface TenderCardProps {
   tender: Tender;
   onReject?: (tenderId: number) => void;
   onAnalyze?: (tenderId: number) => void;
+  onViewDetails?: (tenderId: number) => void;
 }
 
-export function TenderCard({ tender, onReject, onAnalyze }: TenderCardProps) {
+export function TenderCard({ tender, onReject, onAnalyze, onViewDetails }: TenderCardProps) {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleReject = async () => {
@@ -58,14 +59,40 @@ export function TenderCard({ tender, onReject, onAnalyze }: TenderCardProps) {
   };
 
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
+    <Card shadow="sm" padding="lg" radius="md" withBorder style={{ position: 'relative' }}>
       <Stack gap="sm">
-        {/* Header with organization */}
-        <Group gap="xs">
-          <IconBuilding size={16} />
-          <Text size="sm" fw={500} truncate>
-            {tender.buyer.originalName}
-          </Text>
+        {/* Header with organization and action buttons */}
+        <Group justify="space-between">
+          <Group gap="xs">
+            <IconBuilding size={16} />
+            <Text size="sm" fw={500} truncate>
+              {tender.buyer.originalName}
+            </Text>
+          </Group>
+          
+          {/* Action buttons */}
+          <Group gap="xs">
+            <Button
+              variant="outline"
+              color="red"
+              size="xs"
+              onClick={handleReject}
+              disabled={isProcessing}
+              loading={isProcessing}
+            >
+              X Rejeter
+            </Button>
+            <Button
+              variant="filled"
+              color="blue"
+              size="xs"
+              onClick={handleAnalyze}
+              disabled={isProcessing}
+              loading={isProcessing}
+            >
+              ✓ À analyser
+            </Button>
+          </Group>
         </Group>
 
         {/* Title */}
@@ -116,38 +143,47 @@ export function TenderCard({ tender, onReject, onAnalyze }: TenderCardProps) {
           </Group>
         </Group>
 
-        {/* CPV if available */}
+        {/* CPV */}
         {tender.cpvAsString.length > 0 && (
-          <Box>
-            <Text size="xs" c="dimmed">
-              CPV {tender.cpvAsString[0]}
-            </Text>
-          </Box>
+          <Text size="xs" c="dimmed">
+            CPV {tender.cpvAsString[0]}
+          </Text>
         )}
-
-        {/* Action buttons */}
-        <Group justify="flex-end" gap="sm">
-          <Button
-            variant="outline"
-            color="red"
-            size="xs"
-            onClick={handleReject}
-            disabled={isProcessing}
-            loading={isProcessing}
-          >
-            X Rejeter
-          </Button>
-          <Button
-            variant="filled"
-            color="blue"
-            size="xs"
-            onClick={handleAnalyze}
-            disabled={isProcessing}
-            loading={isProcessing}
-          >
-            ✓ À analyser
-          </Button>
-        </Group>
+        
+        {/* Styled arrow button in bottom right corner */}
+        <Box
+          style={{
+            position: 'absolute',
+            bottom: '-10px',
+            right: '-10px',
+            cursor: 'pointer',
+            transform: 'rotate(-45deg)',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '10px',
+            padding: '10px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+            border: '1px solid #e9ecef',
+            transition: 'all 0.2s ease',
+            width: '32px',
+            height: '32px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onClick={() => onViewDetails?.(tender.id)}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#e9ecef';
+            e.currentTarget.style.transform = 'rotate(-45deg) scale(1.05)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#f8f9fa';
+            e.currentTarget.style.transform = 'rotate(-45deg) scale(1)';
+            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+          }}
+        >
+          <IconArrowRight size={16} color="#666" />
+        </Box>
       </Stack>
     </Card>
   );
