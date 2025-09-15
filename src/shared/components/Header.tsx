@@ -1,7 +1,12 @@
 import { Group, TextInput, Button, Avatar, Text, Tabs } from '@mantine/core';
 import { IconSearch, IconStar, IconUser } from '@tabler/icons-react';
 
-export function Header() {
+interface HeaderProps {
+  activeTab: string;
+  onTabChange: (value: string) => void;
+}
+
+export function Header({ activeTab, onTabChange }: HeaderProps) {
   return (
     <Group justify="space-between" h="100%" px="md">
         {/* Logo */}
@@ -10,7 +15,7 @@ export function Header() {
         </Text>
 
       {/* Navigation tabs */}
-      <Tabs defaultValue="streams">
+      <Tabs value={activeTab} onChange={(value) => value && onTabChange(value)}>
         <Tabs.List>
           <Tabs.Tab value="streams">Flux d'opportunités</Tabs.Tab>
           <Tabs.Tab value="pipeline">Pipeline</Tabs.Tab>

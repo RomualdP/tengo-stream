@@ -57,6 +57,22 @@ app.post('/interactions/decisionStatus', (req, res) => {
   });
 });
 
+app.get('/tenders/pipeline', (req, res) => {
+  // Get tenders that have been marked as TO_ANALYZE
+  const toAnalyzeTenderIds = interactions
+    .filter(i => i.decisionStatus === 'TO_ANALYZE')
+    .map(i => i.tenderId);
+  
+  const pipelineTenders = tenders.filter(t => toAnalyzeTenderIds.includes(t.id));
+  
+  res.json({
+    pagination: { skip: 0, take: pipelineTenders.length },
+    results: pipelineTenders,
+    totalCount: pipelineTenders.length,
+    remainingCount: pipelineTenders.length
+  });
+});
+
 app.listen(3000, () => {
   console.log('Mock API server running on http://localhost:3000');
 });
