@@ -39,30 +39,28 @@ export function useTendersQuery(): UseTendersQueryReturn {
       return await TenderApiService.searchTenders(pageParam as number, 10);
     },
     getNextPageParam: (lastPage, allPages) => {
-      // Calculate how many items we've actually loaded from the server
-      const serverLoadedCount = allPages.length * 10; // Each page loads 10 items from server
-      const totalAvailable = lastPage.totalCount;
+      const lastPageSize = lastPage.results.length;
+      const currentSkip = allPages.length * 10;
       
-      // There are more pages if we haven't loaded everything from the server yet
-      const hasMore = serverLoadedCount < totalAvailable;
+      const hasMore = lastPageSize === 10;
       
-      return hasMore ? serverLoadedCount : undefined;
+      return hasMore ? currentSkip : undefined;
     },
     initialPageParam: 0,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Auto-load more data when we have few tenders left
+  // Auto-load more data when we have few tenders visible
   useEffect(() => {
     if (!data) return;
     
     const totalVisibleTenders = data.pages.reduce((total, page) => total + page.results.length, 0);
     
-    // If we have less than 5 tenders visible and there are more pages available, load more
+    // If we have 5 or fewer visible tenders and more pages available, load more
     if (totalVisibleTenders <= 5 && hasNextPage && !isFetchingNextPage) {
       const timer = setTimeout(() => {
         fetchNextPage();
-      }, 200);
+      }, 500);
       
       return () => clearTimeout(timer);
     }
@@ -72,51 +70,9 @@ export function useTendersQuery(): UseTendersQueryReturn {
     mutationFn: async ({ tenderId, decisionStatus }: { tenderId: number; decisionStatus: DecisionStatus }) => {
       return await TenderApiService.recordDecision(tenderId, decisionStatus);
     },
-    onSuccess: (_, { tenderId, decisionStatus }) => {
-      // Optimistically update the cache
-      queryClient.setQueryData(['tenders'], (oldData: unknown) => {
-        if (!oldData || typeof oldData !== 'object') return oldData;
-        
-        const data = oldData as { pages: TenderSearchResponse[] };
-        return {
-          ...data,
-          pages: data.pages.map((page: TenderSearchResponse) => ({
-            ...page,
-            results: page.results.filter((tender: Tender) => tender.id !== tenderId),
-          })),
-        };
-      });
-
-      // Check if we need to load more data immediately after mutation
-      const currentData = queryClient.getQueryData(['tenders']) as { pages: TenderSearchResponse[] } | undefined;
-      if (currentData) {
-        const totalVisibleTenders = currentData.pages.reduce((total, page) => total + page.results.length, 0);
-        
-        if (totalVisibleTenders <= 5 && hasNextPage && !isFetchingNextPage) {
-          setTimeout(() => {
-            fetchNextPage();
-          }, 300);
-        }
-      }
-
-      // Update total counts
-      queryClient.setQueryData(['tenders'], (oldData: unknown) => {
-        if (!oldData || typeof oldData !== 'object') return oldData;
-        
-        const data = oldData as { pages: TenderSearchResponse[] };
-        return {
-          ...data,
-          pages: data.pages.map((page: TenderSearchResponse, index: number) => {
-            if (index === 0) {
-              return {
-                ...page,
-                totalCount: Math.max(0, page.totalCount - 1),
-              };
-            }
-            return page;
-          }),
-        };
-      });
+    onSuccess: (_, { decisionStatus }) => {
+      // Simple invalidation pour refetch les données proprement
+      queryClient.invalidateQueries({ queryKey: ['tenders'] });
 
       // Show success notification
       if (decisionStatus === 'TO_ANALYZE') {
