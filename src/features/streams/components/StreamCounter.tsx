@@ -7,7 +7,7 @@ interface StreamCounterProps {
 export function StreamCounter({ remainingCount }: StreamCounterProps) {
   return (
     <Badge size="lg" variant="light" color="blue">
-      {remainingCount} À traiter
+      {remainingCount} Marchés disponibles
     </Badge>
   );
 }

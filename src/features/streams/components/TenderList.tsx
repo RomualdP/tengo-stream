@@ -9,7 +9,6 @@ interface TenderListProps {
   onReject?: (tenderId: number) => void;
   onAnalyze?: (tenderId: number) => void;
   onViewDetails?: (tenderId: number) => void;
-  onLoadMore?: () => void;
 }
 
 export function TenderList({ 

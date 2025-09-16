@@ -1,33 +1,23 @@
 import { useEffect, useRef, useCallback } from 'react';
 
-interface UseInfiniteScrollOptions {
-  hasMore: boolean;
-  loading: boolean;
-  onLoadMore: () => void;
+interface UseInfiniteScrollQueryOptions {
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+  fetchNextPage: () => void;
   threshold?: number;
 }
 
-export function useInfiniteScroll({
-  hasMore,
-  loading,
-  onLoadMore,
+export function useInfiniteScrollQuery({
+  hasNextPage,
+  isFetchingNextPage,
+  fetchNextPage,
   threshold = 100,
-}: UseInfiniteScrollOptions) {
+}: UseInfiniteScrollQueryOptions) {
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const onLoadMoreRef = useRef(onLoadMore);
-  const hasMoreRef = useRef(hasMore);
-  const loadingRef = useRef(loading);
-
-  // Update refs to avoid stale closures
-  useEffect(() => {
-    onLoadMoreRef.current = onLoadMore;
-    hasMoreRef.current = hasMore;
-    loadingRef.current = loading;
-  });
 
   const lastElementRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (loadingRef.current) return;
+      if (isFetchingNextPage) return;
       
       if (observerRef.current) {
         observerRef.current.disconnect();
@@ -35,8 +25,8 @@ export function useInfiniteScroll({
       
       observerRef.current = new IntersectionObserver(
         (entries) => {
-          if (entries[0].isIntersecting && hasMoreRef.current && !loadingRef.current) {
-            onLoadMoreRef.current();
+          if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
           }
         },
         {
@@ -48,7 +38,7 @@ export function useInfiniteScroll({
         observerRef.current.observe(node);
       }
     },
-    [threshold] // Only threshold as dependency
+    [hasNextPage, isFetchingNextPage, fetchNextPage, threshold]
   );
 
   useEffect(() => {

@@ -4,8 +4,8 @@ import { useCallback, useState } from 'react';
 import { TenderList } from './TenderList';
 import { StreamCounter } from './StreamCounter';
 import { TenderDetailPage } from './TenderDetailPage';
-import { useTenders } from '../hooks/useTenders';
-import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import { useTendersQuery } from '../hooks/useTendersQuery';
+import { useInfiniteScrollQuery } from '../hooks/useInfiniteScrollQuery';
 
 export function StreamsPage() {
   const [selectedTenderId, setSelectedTenderId] = useState<number | null>(null);
@@ -15,16 +15,17 @@ export function StreamsPage() {
     loading,
     error,
     remainingCount,
-    hasMore,
-    loadMore,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
     recordDecision,
     refresh,
-  } = useTenders();
+  } = useTendersQuery();
 
-  const { lastElementRef } = useInfiniteScroll({
-    hasMore,
-    loading,
-    onLoadMore: loadMore,
+  const { lastElementRef } = useInfiniteScrollQuery({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
   });
 
   const handleReject = useCallback(async (tenderId: number) => {
@@ -83,12 +84,11 @@ export function StreamsPage() {
         {/* Tender list */}
         <TenderList
           tenders={tenders}
-          loading={loading}
-          hasMore={hasMore}
+          loading={loading || isFetchingNextPage}
+          hasMore={hasNextPage}
           onReject={handleReject}
           onAnalyze={handleAnalyze}
           onViewDetails={handleViewDetails}
-          onLoadMore={loadMore}
         />
 
         {/* Infinite scroll trigger */}

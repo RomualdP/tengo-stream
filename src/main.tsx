@@ -3,42 +3,54 @@ import { createRoot } from 'react-dom/client'
 import { MantineProvider } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import { Toaster } from 'react-hot-toast'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '@mantine/core/styles.css'
 import '@mantine/notifications/styles.css'
 import './index.css'
 import App from './App.tsx'
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 2,
+    },
+  },
+})
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <MantineProvider>
-      <Notifications />
-      <App />
-      <Toaster 
-        position="bottom-right"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: '#ffffff',
-            color: '#333333',
-            border: '1px solid #e5e7eb',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-          },
-          success: {
+    <QueryClientProvider client={queryClient}>
+      <MantineProvider>
+        <Notifications />
+        <App />
+        <Toaster 
+          position="bottom-right"
+          toastOptions={{
             duration: 3000,
-            iconTheme: {
-              primary: '#10b981',
-              secondary: '#ffffff',
+            style: {
+              background: '#ffffff',
+              color: '#333333',
+              border: '1px solid #e5e7eb',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
             },
-          },
-          error: {
-            duration: 4000,
-            iconTheme: {
-              primary: '#ef4444',
-              secondary: '#ffffff',
+            success: {
+              duration: 3000,
+              iconTheme: {
+                primary: '#10b981',
+                secondary: '#ffffff',
+              },
             },
-          },
-        }}
-      />
-    </MantineProvider>
+            error: {
+              duration: 4000,
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#ffffff',
+              },
+            },
+          }}
+        />
+      </MantineProvider>
+    </QueryClientProvider>
   </StrictMode>,
 )
