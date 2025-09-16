@@ -73,6 +73,29 @@ app.get('/tenders/pipeline', (req, res) => {
   });
 });
 
+app.get('/tenders/:id', (req, res) => {
+  const tenderId = parseInt(req.params.id);
+  
+  if (isNaN(tenderId)) {
+    return res.status(400).json({ error: 'Invalid tender ID' });
+  }
+  
+  const tender = tenders.find(t => t.id === tenderId);
+  
+  if (!tender) {
+    return res.status(404).json({ error: 'Tender not found' });
+  }
+  
+  // Check if tender has been processed
+  const interaction = interactions.find(i => i.tenderId === tenderId);
+  
+  res.json({
+    ...tender,
+    decisionStatus: interaction?.decisionStatus || null,
+    processed: !!interaction
+  });
+});
+
 app.listen(3000, () => {
   console.log('Mock API server running on http://localhost:3000');
 });

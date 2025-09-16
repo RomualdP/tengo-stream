@@ -26,6 +26,7 @@ export function useTenders(): UseTendersReturn {
   // Use refs to avoid dependency issues
   const skipRef = useRef(0);
   const loadingRef = useRef(false);
+  const hasMoreRef = useRef(true);
 
   const loadTenders = useCallback(async (reset: boolean = false) => {
     // Prevent multiple simultaneous calls
@@ -53,7 +54,9 @@ export function useTenders(): UseTendersReturn {
         skipRef.current += response.results.length;
       }
       
-      setHasMore(response.results.length === 10);
+      const newHasMore = response.results.length === 10;
+      setHasMore(newHasMore);
+      hasMoreRef.current = newHasMore;
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -64,10 +67,10 @@ export function useTenders(): UseTendersReturn {
   }, []); // No dependencies to avoid re-creation
 
   const loadMore = useCallback(async () => {
-    if (!loadingRef.current && hasMore) {
+    if (!loadingRef.current && hasMoreRef.current) {
       await loadTenders(false);
     }
-  }, [hasMore, loadTenders]);
+  }, [loadTenders]);
 
   const recordDecision = useCallback(async (tenderId: number, decisionStatus: DecisionStatus) => {
     try {
