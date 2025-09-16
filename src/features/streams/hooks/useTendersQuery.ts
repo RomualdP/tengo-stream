@@ -1,4 +1,5 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { TenderApiService } from '../services/tenderApi';
 import type { Tender, DecisionStatus } from '../types';
@@ -35,15 +36,37 @@ export function useTendersQuery(): UseTendersQueryReturn {
   } = useInfiniteQuery<TenderSearchResponse>({
     queryKey: ['tenders'],
     queryFn: async ({ pageParam = 0 }) => {
-      return await TenderApiService.searchTenders(pageParam, 10);
+      return await TenderApiService.searchTenders(pageParam as number, 10);
     },
     getNextPageParam: (lastPage, allPages) => {
-      const loadedCount = allPages.reduce((total, page) => total + page.results.length, 0);
-      return lastPage.results.length === 10 ? loadedCount : undefined;
+      // Calculate how many items we've actually loaded from the server
+      const serverLoadedCount = allPages.length * 10; // Each page loads 10 items from server
+      const totalAvailable = lastPage.totalCount;
+      
+      // There are more pages if we haven't loaded everything from the server yet
+      const hasMore = serverLoadedCount < totalAvailable;
+      
+      return hasMore ? serverLoadedCount : undefined;
     },
     initialPageParam: 0,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  // Auto-load more data when we have few tenders left
+  useEffect(() => {
+    if (!data) return;
+    
+    const totalVisibleTenders = data.pages.reduce((total, page) => total + page.results.length, 0);
+    
+    // If we have less than 5 tenders visible and there are more pages available, load more
+    if (totalVisibleTenders <= 5 && hasNextPage && !isFetchingNextPage) {
+      const timer = setTimeout(() => {
+        fetchNextPage();
+      }, 200);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [data, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const recordDecisionMutation = useMutation({
     mutationFn: async ({ tenderId, decisionStatus }: { tenderId: number; decisionStatus: DecisionStatus }) => {
@@ -51,25 +74,39 @@ export function useTendersQuery(): UseTendersQueryReturn {
     },
     onSuccess: (_, { tenderId, decisionStatus }) => {
       // Optimistically update the cache
-      queryClient.setQueryData(['tenders'], (oldData: any) => {
-        if (!oldData) return oldData;
+      queryClient.setQueryData(['tenders'], (oldData: unknown) => {
+        if (!oldData || typeof oldData !== 'object') return oldData;
         
+        const data = oldData as { pages: TenderSearchResponse[] };
         return {
-          ...oldData,
-          pages: oldData.pages.map((page: TenderSearchResponse) => ({
+          ...data,
+          pages: data.pages.map((page: TenderSearchResponse) => ({
             ...page,
             results: page.results.filter((tender: Tender) => tender.id !== tenderId),
           })),
         };
       });
 
-      // Update total counts
-      queryClient.setQueryData(['tenders'], (oldData: any) => {
-        if (!oldData) return oldData;
+      // Check if we need to load more data immediately after mutation
+      const currentData = queryClient.getQueryData(['tenders']) as { pages: TenderSearchResponse[] } | undefined;
+      if (currentData) {
+        const totalVisibleTenders = currentData.pages.reduce((total, page) => total + page.results.length, 0);
         
+        if (totalVisibleTenders <= 5 && hasNextPage && !isFetchingNextPage) {
+          setTimeout(() => {
+            fetchNextPage();
+          }, 300);
+        }
+      }
+
+      // Update total counts
+      queryClient.setQueryData(['tenders'], (oldData: unknown) => {
+        if (!oldData || typeof oldData !== 'object') return oldData;
+        
+        const data = oldData as { pages: TenderSearchResponse[] };
         return {
-          ...oldData,
-          pages: oldData.pages.map((page: TenderSearchResponse, index: number) => {
+          ...data,
+          pages: data.pages.map((page: TenderSearchResponse, index: number) => {
             if (index === 0) {
               return {
                 ...page,
@@ -110,8 +147,7 @@ export function useTendersQuery(): UseTendersQueryReturn {
         });
       }
     },
-    onError: (error: unknown) => {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to record decision';
+    onError: () => {
       toast.error('La décision n\'a pas pu être enregistrée', {
         icon: '✕',
         style: {
