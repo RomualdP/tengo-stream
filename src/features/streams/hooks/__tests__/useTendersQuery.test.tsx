@@ -3,6 +3,7 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import { vi, type Mock } from 'vitest'
 import { useTendersQuery } from '../useTendersQuery'
 import { TenderApiService } from '../../services/tenderApi'
+import type { DecisionStatus } from '../../types'
 
 vi.mock('../../services/tenderApi', () => ({
   TenderApiService: {
@@ -70,9 +71,10 @@ describe('useTendersQuery', () => {
 
     const { result } = renderHook(() => useTendersQuery(), { wrapper: createWrapper() })
     await waitFor(() => expect(result.current.loading).toBe(false))
-
+    
     await act(async () => {
-      await result.current.recordDecision(1, 'REJECTED' as never)
+      const status: DecisionStatus = 'REJECTED'
+      await result.current.recordDecision(1, status)
     })
 
     await waitFor(() => expect(result.current.tenders[0]?.id).toBe(100))
