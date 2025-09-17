@@ -71,7 +71,7 @@ export function useTendersQuery(): UseTendersQueryReturn {
       return await TenderApiService.recordDecision(tenderId, decisionStatus);
     },
     onSuccess: (_, { decisionStatus }) => {
-      // Simple invalidation pour refetch les données proprement
+      // Simple invalidation to refetch data properly
       queryClient.invalidateQueries({ queryKey: ['tenders'] });
 
       // Show success notification

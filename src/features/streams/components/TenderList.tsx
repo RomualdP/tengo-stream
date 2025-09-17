@@ -1,5 +1,6 @@
 import { Stack, Loader, Text, Box } from '@mantine/core';
 import { TenderCard } from './TenderCard';
+import { TenderCardActions } from './TenderCardActions';
 import type { Tender } from '../types';
 
 interface TenderListProps {
@@ -9,6 +10,7 @@ interface TenderListProps {
   onReject?: (tenderId: number) => void;
   onAnalyze?: (tenderId: number) => void;
   onViewDetails?: (tenderId: number) => void;
+  renderActions?: (tender: Tender) => React.ReactNode;
 }
 
 export function TenderList({ 
@@ -17,17 +19,26 @@ export function TenderList({
   hasMore = false, 
   onReject, 
   onAnalyze,
-  onViewDetails
+  onViewDetails,
+  renderActions
 }: TenderListProps) {
   return (
-    <Stack gap="md">
+    <Stack gap="md" miw={'100%'}>
       {tenders.map((tender) => (
         <TenderCard
           key={tender.id}
           tender={tender}
-          onReject={onReject}
-          onAnalyze={onAnalyze}
           onViewDetails={onViewDetails}
+          actionsSlot={renderActions
+            ? renderActions(tender)
+            : (onReject || onAnalyze)
+              ? (
+                <TenderCardActions 
+                  tenderId={tender.id} 
+                />
+              )
+              : undefined
+          }
         />
       ))}
       

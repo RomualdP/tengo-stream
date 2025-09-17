@@ -1,62 +1,15 @@
-import { Card, Text, Group, Button, Stack, Box } from '@mantine/core';
+import { Card, Text, Group, Stack, Box } from '@mantine/core';
 import { IconBuilding, IconCalendar, IconCurrencyEuro, IconClock, IconMapPin, IconPackage, IconArrowRight } from '@tabler/icons-react';
-import { useState } from 'react';
 import type { Tender } from '../types';
+import { formatDate, formatAmount, getStatusColor } from '../utils/tenderFormatters';
 
 interface TenderCardProps {
   tender: Tender;
-  onReject?: (tenderId: number) => void;
-  onAnalyze?: (tenderId: number) => void;
   onViewDetails?: (tenderId: number) => void;
+  actionsSlot?: React.ReactNode;
 }
 
-export function TenderCard({ tender, onReject, onAnalyze, onViewDetails }: TenderCardProps) {
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const handleReject = async () => {
-    if (isProcessing) return;
-    setIsProcessing(true);
-    try {
-      await onReject?.(tender.id);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleAnalyze = async () => {
-    if (isProcessing) return;
-    setIsProcessing(true);
-    try {
-      await onAnalyze?.(tender.id);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-  };
-
-  const formatAmount = (amount: number) => {
-    if (amount >= 1000000) {
-      return `${(amount / 1000000).toFixed(1)}M€`;
-    } else if (amount >= 1000) {
-      return `${(amount / 1000).toFixed(0)}k€`;
-    }
-    return `${amount}€`;
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'OPEN': return 'green';
-      case 'CLOSED': return 'red';
-      case 'CANCELLED': return 'gray';
-      default: return 'blue';
-    }
-  };
+export function TenderCard({ tender, onViewDetails, actionsSlot }: TenderCardProps) {
 
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder style={{ position: 'relative' }}>
@@ -70,29 +23,8 @@ export function TenderCard({ tender, onReject, onAnalyze, onViewDetails }: Tende
             </Text>
           </Group>
           
-          {/* Action buttons */}
-          <Group gap="xs">
-            <Button
-              variant="outline"
-              color="red"
-              size="xs"
-              onClick={handleReject}
-              disabled={isProcessing}
-              loading={isProcessing}
-            >
-              X Rejeter
-            </Button>
-            <Button
-              variant="filled"
-              color="blue"
-              size="xs"
-              onClick={handleAnalyze}
-              disabled={isProcessing}
-              loading={isProcessing}
-            >
-              ✓ À analyser
-            </Button>
-          </Group>
+          {/* Action buttons slot (only provided by Streams page) */}
+          {actionsSlot}
         </Group>
 
         {/* Title */}

@@ -1,14 +1,14 @@
 import { Container, Title, Group, Stack, Alert, Button } from '@mantine/core';
 import { IconAlertCircle, IconRefresh } from '@tabler/icons-react';
-import { useCallback, useState } from 'react';
 import { TenderList } from './TenderList';
 import { StreamCounter } from './StreamCounter';
 import { TenderDetailPage } from './TenderDetailPage';
 import { useTendersQuery } from '../hooks/useTendersQuery';
 import { useInfiniteScrollQuery } from '../hooks/useInfiniteScrollQuery';
+import { useStreamDecisionHandlers } from '../hooks/useStreamDecisionHandlers';
+import { useStreamSelection } from '../hooks/useStreamSelection';
 
 export function StreamsPage() {
-  const [selectedTenderId, setSelectedTenderId] = useState<number | null>(null);
 
   const {
     tenders,
@@ -28,21 +28,8 @@ export function StreamsPage() {
     fetchNextPage,
   });
 
-  const handleReject = useCallback(async (tenderId: number) => {
-    await recordDecision(tenderId, 'REJECTED');
-  }, [recordDecision]);
-
-  const handleAnalyze = useCallback(async (tenderId: number) => {
-    await recordDecision(tenderId, 'TO_ANALYZE');
-  }, [recordDecision]);
-
-  const handleViewDetails = useCallback((tenderId: number) => {
-    setSelectedTenderId(tenderId);
-  }, []);
-
-  const handleBackToList = useCallback(() => {
-    setSelectedTenderId(null);
-  }, []);
+  const { handleReject, handleAnalyze } = useStreamDecisionHandlers({ recordDecision });
+  const { selectedTenderId, handleViewDetails, handleBackToList } = useStreamSelection();
 
   // Show detail page if a tender is selected
   if (selectedTenderId) {
@@ -50,7 +37,7 @@ export function StreamsPage() {
   }
 
   return (
-    <Container size="lg" py="md">
+    <Container size="lg" py="md" maw={1200} mx="auto">
       <Stack gap="md">
         {/* Stream title and counter */}
         <Group justify="space-between">
