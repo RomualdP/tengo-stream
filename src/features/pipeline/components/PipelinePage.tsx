@@ -3,7 +3,11 @@ import { IconAlertCircle, IconClipboardList, IconRefresh } from '@tabler/icons-r
 import { TenderList } from '../../streams/components/TenderList';
 import { usePipeline } from '../hooks/usePipeline';
 
-export function PipelinePage() {
+interface PipelinePageProps {
+  onNavigateToDetail: (tenderId: number, returnTo?: 'streams' | 'pipeline') => void;
+}
+
+export function PipelinePage({ onNavigateToDetail }: PipelinePageProps) {
   const {
     tenders,
     loading,
@@ -71,6 +75,7 @@ export function PipelinePage() {
           hasMore={false}
           onReject={undefined}
           onAnalyze={undefined}
+          onViewDetails={(tenderId) => onNavigateToDetail(tenderId, 'pipeline')}
         />
       </Stack>
     </Container>

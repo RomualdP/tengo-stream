@@ -1,12 +1,45 @@
 import { Group, TextInput, Button, Avatar, Text, Tabs } from '@mantine/core';
-import { IconSearch, IconStar, IconUser } from '@tabler/icons-react';
+import { IconSearch, IconStar, IconUser, IconArrowLeft } from '@tabler/icons-react';
+import type { PageParams } from '../types/navigation';
 
 interface HeaderProps {
   activeTab: string;
   onTabChange: (value: string) => void;
+  currentPage: PageParams;
+  canGoBack: boolean;
+  onNavigateBack: () => void;
 }
 
-export function Header({ activeTab, onTabChange }: HeaderProps) {
+export function Header({ activeTab, onTabChange, currentPage, canGoBack, onNavigateBack }: HeaderProps) {
+  const renderNavigation = () => {
+    if (currentPage.type === 'tender-detail') {
+      return (
+        <Group gap="md">
+          <Button 
+            variant="subtle" 
+            leftSection={<IconArrowLeft size={16} />} 
+            onClick={onNavigateBack}
+            disabled={!canGoBack}
+          >
+            Retour
+          </Button>
+          <Text size="lg" fw={500}>
+            Détail du marché
+          </Text>
+        </Group>
+      );
+    }
+
+    return (
+      <Tabs value={activeTab} onChange={(value) => value && onTabChange(value)}>
+        <Tabs.List>
+          <Tabs.Tab value="streams">Flux d'opportunités</Tabs.Tab>
+          <Tabs.Tab value="pipeline">Pipeline</Tabs.Tab>
+        </Tabs.List>
+      </Tabs>
+    );
+  };
+
   return (
     <Group justify="space-between" h="100%" px="md">
         {/* Logo */}
@@ -14,13 +47,8 @@ export function Header({ activeTab, onTabChange }: HeaderProps) {
           tengo
         </Text>
 
-      {/* Navigation tabs */}
-      <Tabs value={activeTab} onChange={(value) => value && onTabChange(value)}>
-        <Tabs.List>
-          <Tabs.Tab value="streams">Flux d'opportunités</Tabs.Tab>
-          <Tabs.Tab value="pipeline">Pipeline</Tabs.Tab>
-        </Tabs.List>
-      </Tabs>
+      {/* Navigation */}
+      {renderNavigation()}
 
       {/* Search bar */}
       <TextInput

@@ -1,14 +1,13 @@
 import { Container, Title, Stack, Alert, Text, Group, Badge, Button, Card, Divider, Box, Grid } from '@mantine/core';
-import { IconAlertCircle, IconRefresh, IconBuilding, IconCalendar, IconCurrencyEuro, IconClock, IconMapPin, IconPackage, IconArrowLeft } from '@tabler/icons-react';
+import { IconAlertCircle, IconRefresh, IconBuilding, IconCalendar, IconCurrencyEuro, IconClock, IconMapPin, IconPackage } from '@tabler/icons-react';
 import { useCallback } from 'react';
 import { useTenderDetails } from '../hooks/useTenderDetails';
 
 interface TenderDetailPageProps {
   tenderId: number;
-  onBack: () => void;
 }
 
-export function TenderDetailPage({ tenderId, onBack }: TenderDetailPageProps) {
+export function TenderDetailPage({ tenderId }: TenderDetailPageProps) {
   const {
     tender,
     loading,
@@ -60,11 +59,6 @@ export function TenderDetailPage({ tenderId, onBack }: TenderDetailPageProps) {
     return (
       <Container size="lg" py="md">
         <Stack gap="md">
-          <Group>
-            <Button variant="subtle" leftSection={<IconArrowLeft size={16} />} onClick={onBack}>
-              Retour
-            </Button>
-          </Group>
           <Text>Chargement des détails...</Text>
         </Stack>
       </Container>
@@ -75,11 +69,6 @@ export function TenderDetailPage({ tenderId, onBack }: TenderDetailPageProps) {
     return (
       <Container size="lg" py="md">
         <Stack gap="md">
-          <Group>
-            <Button variant="subtle" leftSection={<IconArrowLeft size={16} />} onClick={onBack}>
-              Retour
-            </Button>
-          </Group>
           <Alert
             icon={<IconAlertCircle size={16} />}
             title="Erreur de chargement"
@@ -97,11 +86,6 @@ export function TenderDetailPage({ tenderId, onBack }: TenderDetailPageProps) {
     return (
       <Container size="lg" py="md">
         <Stack gap="md">
-          <Group>
-            <Button variant="subtle" leftSection={<IconArrowLeft size={16} />} onClick={onBack}>
-              Retour
-            </Button>
-          </Group>
           <Text>Marché non trouvé</Text>
         </Stack>
       </Container>
@@ -111,11 +95,8 @@ export function TenderDetailPage({ tenderId, onBack }: TenderDetailPageProps) {
   return (
     <Container size="lg" py="md">
       <Stack gap="md">
-        {/* Header with back button and actions */}
-        <Group justify="space-between">
-          <Button variant="subtle" leftSection={<IconArrowLeft size={16} />} onClick={onBack}>
-            Retour
-          </Button>
+        {/* Header with actions */}
+        <Group justify="flex-end">
           <Group gap="sm">
             {tender.processed ? (
               <Badge 
