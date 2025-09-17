@@ -1,6 +1,8 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import toast from 'react-hot-toast';
+import React from 'react';
+import { notifications } from '@mantine/notifications';
+import { IconCheck, IconX } from '@tabler/icons-react';
 import { TenderApiService } from '../services/tenderApi';
 import type { Tender, DecisionStatus } from '../types';
 
@@ -76,45 +78,30 @@ export function useTendersQuery(): UseTendersQueryReturn {
 
       // Show success notification
       if (decisionStatus === 'TO_ANALYZE') {
-        toast.success('Marché ajouté au pipeline', {
-          icon: '✓',
-          style: {
-            background: '#ffffff',
-            color: '#333333',
-            border: '1px solid #e5e7eb',
-          },
-          iconTheme: {
-            primary: '#10b981',
-            secondary: '#ffffff',
-          },
+        notifications.show({
+          title: 'Succès',
+          message: 'Marché ajouté au pipeline',
+          color: 'teal',
+          icon: React.createElement(IconCheck, { size: 20 }),
+          autoClose: 3000,
         });
       } else {
-        toast.success('Marché rejeté', {
-          icon: '✕',
-          style: {
-            background: '#ffffff',
-            color: '#333333',
-            border: '1px solid #e5e7eb',
-          },
-          iconTheme: {
-            primary: '#ef4444',
-            secondary: '#ffffff',
-          },
+        notifications.show({
+          title: 'Succès',
+          message: 'Marché rejeté',
+          color: 'red',
+          icon: React.createElement(IconX, { size: 20 }),
+          autoClose: 3000,
         });
       }
     },
     onError: () => {
-      toast.error('La décision n\'a pas pu être enregistrée', {
-        icon: '✕',
-        style: {
-          background: '#ffffff',
-          color: '#333333',
-          border: '1px solid #e5e7eb',
-        },
-        iconTheme: {
-          primary: '#ef4444',
-          secondary: '#ffffff',
-        },
+      notifications.show({
+        title: 'Erreur',
+        message: 'La décision n\'a pas pu être enregistrée',
+        color: 'red',
+        icon: React.createElement(IconX, { size: 20 }),
+        autoClose: 4000,
       });
     },
   });
@@ -125,17 +112,12 @@ export function useTendersQuery(): UseTendersQueryReturn {
 
   const refresh = () => {
     refetch();
-    toast.success('Flux actualisé', {
-      icon: '✓',
-      style: {
-        background: '#ffffff',
-        color: '#333333',
-        border: '1px solid #e5e7eb',
-      },
-      iconTheme: {
-        primary: '#10b981',
-        secondary: '#ffffff',
-      },
+    notifications.show({
+      title: 'Succès',
+      message: 'Flux actualisé',
+      color: 'teal',
+      icon: React.createElement(IconCheck, { size: 20 }),
+      autoClose: 3000,
     });
   };
 

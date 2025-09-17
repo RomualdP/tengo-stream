@@ -16,7 +16,7 @@ A React-based tender management application that allows users to browse, filter,
 - **Frontend**: React 18, TypeScript, Vite
 - **UI Library**: Mantine (components, hooks, notifications)
 - **Styling**: Tailwind CSS
-- **Notifications**: react-hot-toast
+- **Notifications**: @mantine/notifications
 - **Backend**: Express.js (mock server)
 - **Icons**: Tabler Icons
 

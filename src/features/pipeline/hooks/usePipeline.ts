@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import toast from 'react-hot-toast';
+import React from 'react';
+import { notifications } from '@mantine/notifications';
+import { IconCheck, IconX } from '@tabler/icons-react';
 import { TenderApiService } from '../../streams/services/tenderApi';
 import type { Tender } from '../../streams/types';
 
@@ -37,31 +39,21 @@ export function usePipeline(): UsePipelineReturn {
   const refresh = useCallback(async () => {
     try {
       await loadPipelineTenders();
-      toast.success('Pipeline actualisé', {
-        icon: '✓',
-        style: {
-          background: '#ffffff',
-          color: '#333333',
-          border: '1px solid #e5e7eb',
-        },
-        iconTheme: {
-          primary: '#10b981',
-          secondary: '#ffffff',
-        },
+      notifications.show({
+        title: 'Succès',
+        message: 'Pipeline actualisé',
+        color: 'teal',
+        icon: React.createElement(IconCheck, { size: 20 }),
+        autoClose: 3000,
       });
     } catch (err) {
       console.error('Pipeline refresh error:', err);
-      toast.error('Erreur lors de l\'actualisation du pipeline', {
-        icon: '✕',
-        style: {
-          background: '#ffffff',
-          color: '#333333',
-          border: '1px solid #e5e7eb',
-        },
-        iconTheme: {
-          primary: '#ef4444',
-          secondary: '#ffffff',
-        },
+      notifications.show({
+        title: 'Erreur',
+        message: 'Erreur lors de l\'actualisation du pipeline',
+        color: 'red',
+        icon: React.createElement(IconX, { size: 20 }),
+        autoClose: 4000,
       });
     }
   }, [loadPipelineTenders]);
